@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssm.dao.ProjectDao">
+
+    <select id="findAllProjects" resultType="com.ssm.entity.Project">
+        select * from projects where available = 0
+    </select>
+
+    <select id="queryProjectsByCategory" resultType="com.ssm.entity.Project">
+        select * from projects where level2 = #{code}
+    </select>
+
+    <select id="findProjectByLanguage" resultType="com.ssm.entity.Project">
+        select * from projects where language = #{language}
+    </select>
+
+    <select id="queryProjectById" parameterType="int" resultType="com.ssm.entity.Project">
+        select * from projects where id = #{id}
+    </select>
+
+    <select id="queryProjectsBySupervisor" resultType="com.ssm.entity.Project">
+        select * from projects where supervisor = #{supervisor}
+    </select>
+
+    <select id="queryCCS" resultType="com.ssm.entity.CCS">
+        select * from ccs where code = #{code}
+    </select>
+
+    <!--
+    <select id="queryProject" resultType="com.ssm.entity.Project">
+        select * from projects
+        <choose>
+            <when test="title!=null">
+                AND title like #{title}
+            </when>
+            <when test="language!=null">
+                where languages = #{language}
+            </when>
+            <when test="supervisor!=null">
+                where supervisor = #{supervisor}
+            </when>
+        </choose>
+    </select>
+
+    <select id="findAllProjects" resultType="com.ssm.entity.Project">
+        select * from projects where available = 0
+    </select>
+
+    <select id="queryProjectsByCategory" resultType="com.ssm.entity.Project">
+        select * from projects where level2 = #{code}
+    </select>
+
+    <select id="findProjectByLanguage" resultType="com.ssm.entity.Project">
+        select * from projects where language = #{language}
+    </select>
+
+    <select id="queryProjectById" parameterType="int" resultType="com.ssm.entity.Project">
+        select * from projects where id = #{id}
+    </select>
+
+    -->
+
+    <insert id="addProject" parameterType="com.ssm.entity.Project" useGeneratedKeys="true" keyProperty="projectId">
+        INSERT INTO projects (title, supervisor, reference, languages, available, description, category)
+        VALUES (#{title}, #{supervisor}, #{reference}, #{language}, 0 ,#{description}, #{category})
+    </insert>
+
+
+</mapper>
