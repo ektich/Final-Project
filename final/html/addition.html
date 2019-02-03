@@ -1,0 +1,72 @@
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>t</title>
+		<link rel="stylesheet" href="../css/bootstrap.min.css">
+		<link rel="stylesheet" href="../css/addition.css">
+		<script src="../js/addition.js"></script>
+	</head>
+	<body>
+		<div id="body-content">
+			<form>
+				<div class="form-group">
+    				<label for="ipTitle">Title</label>
+    				<input type="text" class="form-control" id="ipTitle" placeholder="Title">
+  				</div>
+  				<div class="form-group">
+    				<label for="ipLanguage">Language</label>
+    				<input type="text" class="form-control" id="ipLanguage" placeholder="Language">
+  				</div>
+  				<div class="form-row">
+    				<div class="form-group col-md-6">
+      					<label for="ipSupervisor">Supervisor</label>
+      					<input type="text" class="form-control" id="ipSupervisor" placeholder="Name">
+    				</div>
+    				<div class="form-group col-md-6">
+      					<label for="ipDegree">Degree</label>
+      					<select id="ipDegree" class="form-control">
+        				<option>Bachelor</option>
+        				<option>Master</option>
+        				<option>Both bachelor and master</option>
+      					</select>
+    				</div>
+  				</div>
+  				<div class="form-group">
+    				<label for="ipLevel1">Level1</label>
+    				<select id="ipLevel1" class="form-control" onchange="test()">
+    					<option>Choose...</option>
+    				</select>
+  				</div>
+  				<div class="form-group">
+    				<label for="ipLevel2">Level2</label>
+    				<select id="ipLevel2" class="form-control">
+    				</select>
+  				</div>
+  				<!--
+				<div class="form-group">
+    				<label for="ipLevel3">Level3</label>
+    				<input type="text" class="form-control" id="ipLevel3" placeholder="CCS Category">
+  				</div>
+  				-->
+  				<div class="form-group">
+    				<div class="form-check">
+      					<input class="form-check-input" type="checkbox" id="ipAvailable">
+      					<label class="form-check-label" for="ipAvailable">Available</label>
+    				</div>
+  				</div>
+  				<div class="form-group">
+    				<label for="ipReference">Reference</label>
+    				<textarea class="form-control" id="ipReference" rows="3"></textarea>
+  				</div>
+  				<div class="form-group">
+    				<label for="ipDescription">Description</label>
+    				<textarea class="form-control" id="ipDescription" rows="5"></textarea>
+  				</div>
+  				
+			</form>
+			<div id="test">
+				<button id="submit" class="btn btn-primary" onclick="collection()">Submit</button>
+			</div>
+		</div>
+	</body>
+</html>

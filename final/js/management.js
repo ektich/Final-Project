@@ -48,7 +48,7 @@ function table (t, i) {
 	const thead = document.createElement('thead');
 	thead.setAttribute('id', 'thead-' + i);
 	const tr = document.createElement('tr');
-	for(let j = 1; j <= 4; j++) {
+	for(let j = 1; j <= 5; j++) {
 		const th = document.createElement('th');
 		th.setAttribute('scope', 'col');
 		if(j === 1) {
@@ -56,8 +56,10 @@ function table (t, i) {
 		} else if(j === 2) {
 			th.innerHTML = 'Project Id';
 		} else if(j === 3) {
-			th.innerHTML = 'Student Id';
+			th.innerHTML = 'Category';
 		} else if(j === 4) {
+			th.innerHTML = 'Student Id';
+		} else if(j === 5) {
 			th.innerHTML = 'Tendency';
 		}
 		tr.appendChild(th);
@@ -75,13 +77,15 @@ function row (p, i, j) {
 	const th = document.createElement('th');
 	th.innerHTML = j;
 	tr.appendChild(th);
-	for(let i = 0; i < 4; i++) {
+	for(let i = 0; i < 5; i++) {
 		const td = document.createElement('td');
 		if(i === 0) {
 			td.innerHTML = p.pid;
 		} else if(i === 1) {
+			td.innerHTML = p.pc;
+		} else if(i === 2){
 			td.innerHTML = p.id;
-		} else if(i === 2) {
+		} else if(i === 3) {
 			td.innerHTML = p.tendency;
 		}
 		tr.appendChild(td);

@@ -2,9 +2,11 @@
     window.onload = () => {
         loadData();
         topList();
-        
-        queryStates(2);
-
+        //queryStates();
+        loadCategory();
+        ccsQuery();
+        welcome();
+        //console.log(this);
         let login = document.getElementById('a-login');
         login.onclick = loginPage;
         let management = document.getElementById('a-management');
@@ -34,8 +36,143 @@
         } else if(lecture) {
             console.log(document.getElementById('lu').innerHTML);
         }
+
+        let array = document.getElementsByClassName('dropdown-item');
+        for(let i of array) {
+            i.onclick = ccsQuery;
+        }
     }
 })();
+
+function welcome() {
+    let username = sessionStorage.getItem('username');
+    if(username !== undefined) {
+        //console.log(username);
+    }
+}
+
+function ccsQuery() {
+    let code = this.id;
+    if(code !== undefined) {
+        code = code.split('-').pop();
+    }
+    let url = 'http://localhost:8080/project/level?code=' + code;
+    if(code == undefined) {
+        url = 'http://localhost:8080/project/level?code=0';    
+    }
+    ajaxRequest(url).then(response => {
+        if(code == undefined) {
+            for(let i = 0; i < response.length; i++) {
+                outerCategory(response[i], i);
+            }
+        } else {
+            let ul = document.getElementById('ul-' + code);
+            if(ul.innerHTML !== '') return false;
+            for(let i = 0; i < response.length; i++) {
+                innerCategory(response[i], i, ul);
+            }
+        }
+        //console.log(response);
+    });
+}
+
+let codeForQuery = 0;
+function classifyQuery() {
+    const level1Select = document.getElementById('ipLevel1');
+    const level2Select = document.getElementById('ipLevel2');
+    const level3Select = document.getElementById('ipLevel3');
+    const level1Code = level1Select.selectedIndex;
+    const level2Code = level2Select.selectedIndex;
+    const level3Code = level3Select.selectedIndex;
+    if(level3Code !== 0 && level2Code !== 0 && level1Code !== 0) {
+        const code3 = level3Select[level3Code].getAttribute('data-id');
+        if(code3 !== null) {
+            codeForQuery = code3;
+            let url = 'http://localhost:8080/project/all/1?code=' + codeForQuery;
+            classifyQueryRequest(url);
+            //console.log(codeForQuery);
+        }
+    } else if(level2Code !== 0 && level1Code !== 0 && level3Code === 0) {
+        const code2 = level2Select[level2Code].getAttribute('data-id');
+        if(code2 !== null) {
+            codeForQuery = code2;
+            let url = 'http://localhost:8080/project/all/1?code=' + codeForQuery;
+            classifyQueryRequest(url);
+            //console.log(codeForQuery);
+        }
+    } else if(level1Code !== 0 && level2Code === 0 && level3Code === 0){
+        const code1 = level1Select[level1Code].getAttribute('data-id');
+        if(code1 !== null) {
+            codeForQuery = code1;
+            let url = 'http://localhost:8080/project/all/1?code=' + codeForQuery;
+            classifyQueryRequest(url);
+            //console.log(codeForQuery);
+        }
+    } else if(level1Code === 0 && level2Code === 0 && level3Code === 0) {
+        alert('choose at least one level');
+    }
+}
+
+function classifyQueryRequest(url) {
+    ajaxRequest(url).then(response => {
+        if(response.size !== 0) {
+            document.getElementById('project-list').innerHTML = '';
+            for(let i of response.list) {
+                insertion(i);
+            }
+            document.getElementById('page-info-list').innerHTML = '';
+            pagination(response.pageNum, response.pages);
+        } else {
+            alert("Didn't find any projects")
+        }
+    });
+}
+
+function outerCategory(i, j) {
+    let outer = document.createElement('div');
+    outer.setAttribute('class', 'col-md-2');
+    let inner = document.createElement('div');
+    inner.onclick = ccsQuery;
+    let ul = document.createElement('ul');
+    inner.setAttribute('class', 'dropdown-toggle');
+    inner.setAttribute('id', 'dropdownMenuButton-' + (j+1));
+    inner.setAttribute('data-toggle', 'dropdown');
+    inner.setAttribute('type', 'button');
+    inner.innerHTML = i.name;
+    ul.setAttribute('id', 'ul-' + (j+1));
+    ul.setAttribute('class', 'dropdown-menu');
+    ul.setAttribute('aria-labelledby', 'dropdownMenuButton');
+    outer.appendChild(inner);
+    outer.appendChild(ul);
+    if(j < 6) document.getElementById('category-content1').appendChild(outer);
+    else document.getElementById('category-content2').appendChild(outer);
+}
+
+function innerCategory(i, j, ul) {
+    //let ul = document.getElementById('ul-'+(j+1));
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.setAttribute('class', 'dropdown-item');
+    a.setAttribute('data-trigger', 'hover');
+    a.setAttribute('href', '');
+    a.setAttribute('id', i.id);
+    a.innerHTML = i.name;
+    a.onclick = queryProjectByCode;
+    a.addEventListener("mouseover", () => {
+        ccsQuery2(a);
+    });
+    li.appendChild(a);
+    ul.appendChild(li);
+}
+
+function queryProjectByCode() {
+    let code = this.id;
+    let url = 'http://localhost:8080/project/category?code=' + code;
+    ajaxRequest(url).then(response => {
+        console.log(response);
+    });
+    return false;
+}
 
 function ajaxRequest (url) {
     return new Promise((resolve, reject) => {
@@ -58,13 +195,10 @@ function ajaxRequest (url) {
     });
 }
 
-function loadData (page) {
-    let url = '';
-    if(page === '' || page == null) {
-        url = 'http://localhost:8080/project/all/1';
-    } else {
-        url = 'http://localhost:8080/project/all/' + page;
-    }
+function loadData (page, codeForQuery) {
+    page = page === undefined ? 1 : page;
+    codeForQuery = codeForQuery === undefined ? 0 : codeForQuery;
+    let url = 'http://localhost:8080/project/all/' + page + '?code=' + codeForQuery;
     ajaxRequest (url).then(response => {
         //console.log(response);
         const body = document.getElementById('container');
@@ -96,7 +230,7 @@ function insertion (project) {
     a.onclick = detailsProjectPage;
     a.appendChild(document.createElement('br'));
     outerDiv.appendChild(innerDiv);
-    for(let i = 1; i <= 4; i++) {
+    for(let i = 1; i <= 6; i++) {
         const b = document.createElement('b');
         const span = document.createElement('span');
         if(i === 1) {
@@ -106,14 +240,20 @@ function insertion (project) {
             b.innerHTML = 'Supervisor: ';
             span.innerHTML = project.supervisor;
         } else if(i === 3) {
-            b.innerHTML = 'Degree: ';
+            b.innerHTML = 'Required degree: ';
             span.innerHTML = project.degree;
-        } else {
+        } else if(i === 4){
             b.innerHTML = 'CCS: ';
             span.innerHTML = project.level1;
+        } else if(i === 5) {
+            span.innerHTML = project.level2;
+        } else {
+            span.innerHTML = project.level3;
         }
-        outerDiv.appendChild(document.createElement('br'));
-        outerDiv.appendChild(b);
+        if(i < 5) {
+            outerDiv.appendChild(document.createElement('br'));
+            outerDiv.appendChild(b);        
+        }
         outerDiv.appendChild(document.createElement('br'));
         outerDiv.appendChild(span);
     }
@@ -196,7 +336,7 @@ function pagination (pageNum, pages) {
 
 function turningPage () {
     let page = this.firstChild.innerHTML;
-    loadData(page);
+    loadData(page, codeForQuery);
     return false;
 }
 
@@ -284,6 +424,93 @@ function queryStates(id) {
     });
 }
 
+let level1 = 0;
+let level2 = 0;
+function queryCCSCategory () {
+    const level1Select = document.getElementById('ipLevel1');
+    const level2Select = document.getElementById('ipLevel2');
+    const level3Select = document.getElementById('ipLevel3');
+    const index1 = level1Select.selectedIndex;
+    const index2 = level2Select.selectedIndex;
+    const index3 = level3Select.selectedIndex;
+    let code1 = 0;
+    let code2 = 0;
+    let code3 = 0;
+    if(index1 !== 0) {
+        code1 = document.getElementById('ipLevel1').getElementsByTagName('option')[index1].getAttribute('data-id');
+    }
+    if(index2 !== 0) {
+        code2 = document.getElementById('ipLevel2').getElementsByTagName('option')[index2].getAttribute('data-id');
+    }
+    if(index3 !== 0) {
+        code3 = document.getElementById('ipLevel3').getElementsByTagName('option')[index3].getAttribute('data-id');
+    }
+    //console.log(level1 + '/ ' + level2 + '/ ' + level3);
+    const first = document.createElement('option');
+    first.innerHTML = 'Choose...';    
+    if(code1 === 0) {
+        //console.log(1);
+        clearOptions(level2Select);
+        clearOptions(level3Select);
+        level1 = 0;
+    } else if (code1 !== 0 && code2 === 0 && code3 === 0){
+        //console.log(2);
+        loadCategory(code1);
+        level1 = code1; 
+    } else if(code1 !== level1 && (code2 !== 0 || code3 !== 0)) {
+        //console.log(3);
+        clearOptions(level2Select);
+        clearOptions(level3Select);
+        loadCategory(code1);
+        level1 = code1;
+    } else if(code2 === 0 || code2 !== level2){
+        //console.log(4);
+        clearOptions(level3Select);
+        loadCategory(code2);
+        level2 = code2;
+    }
+}
+
+function clearOptions(e) {
+    const option = document.createElement('option');
+    option.innerHTML = 'Choose...';
+    e.innerHTML = '';
+    e.appendChild(option);
+}
+
+function loadCategory (code) {
+    code = code === undefined ? 0 : code;
+    let url = 'http://localhost:8080/project/level?code=' + code;
+    let level1Select = document.getElementById('ipLevel1');
+    let level2Select = document.getElementById('ipLevel2');
+    let level3Select = document.getElementById('ipLevel3');
+    let length = document.getElementById('ipLevel1').getElementsByTagName('option').length;
+    ajaxRequest(url).then(response => {
+        if(code === 0 && length < 2) {
+            for(let i = 0; i < response.length; i++) {
+                insertOption(response[i], level1Select);
+            }
+        } else if(level2Select.selectedIndex !== 0 && level1Select.selectedIndex !== 0) {
+            for(let i = 0; i < response.length; i++) {
+                insertOption(response[i], level3Select);
+            }
+        } else {
+            for(let i = 0; i < response.length; i++) {
+                insertOption(response[i], level2Select);
+            }
+        }
+    });
+}
+
+function insertOption (i, select) {
+    let option = document.createElement('option');
+    option.innerHTML = i.name;
+    option.setAttribute('data-id', i.id);
+    select.appendChild(option);
+}
+
+
+
 function logout () {
     let url = 'http://localhost:8080/user/logout.do';
     ajaxRequest(url).then(result => {
@@ -332,7 +559,7 @@ function testTimeOut() {
 
 function detailsProjectPage () { 
     console.log(this.href.split('/').pop());
-    let id = this.href.split('/').pop();
+    const id = this.href.split('/').pop();
     sessionStorage.setItem("pid", id); 
     window.location.href = 'project.html';
     //window.opener.function();
@@ -341,7 +568,7 @@ function detailsProjectPage () {
 
 
 function test6() {
-    let id = this.href.split('/').pop();
+    const id = this.href.split('/').pop();
     sessionStorage.setItem("pid", id);
     return false;
 }

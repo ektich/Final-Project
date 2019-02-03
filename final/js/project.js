@@ -25,24 +25,32 @@ function ajax (url) {
 }
 
 function getData () {
-	let id = sessionStorage.getItem("pid");
-	let url = 'http://localhost:8080/project/' + id;
+	const id = sessionStorage.getItem("pid");
+	const url = 'http://localhost:8080/project/' + id;
 	ajax(url).then(result => {
 		console.log(result);
 		display(result);
 	});
 }
 
-
 function display(p) {
 	const body = document.getElementById('container');
 	const title = document.createElement('b');
-	title.innerHTML = p.title;
 	const description = document.createElement('p');
 	const reference = document.createElement('p');
+	const language = document.createElement('p');
+	const level1 = document.createElement('level1');
+	const level2 = document.createElement('level2');
+	title.innerHTML = p.title;
 	description.innerHTML = p.description;
 	reference.innerHTML = p.reference;
+	language.innerHTML = p.language;
+	level1.innerHTML = p.level1;
+	levl2.innerHTML = p.level2;
 	body.appendChild(title);
 	body.appendChild(description);
 	body.appendChild(reference);
+	body.appendChild(language);
+	body.appendChild(level1);
+	body.appendChild(level2);
 }
