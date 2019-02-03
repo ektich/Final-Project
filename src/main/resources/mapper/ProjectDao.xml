@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssm.dao.ProjectDao">
+
+    <select id="findAllProjects" resultType="com.ssm.entity.Project">
+        select projects.id, title, supervisor, reference, `language`, description, degree, ccs.name as level1, level2
+        from projects
+        LEFT JOIN ccs on projects.level1 = ccs.id where available = 0
+    </select>
+
+    <select id="topProjects" resultType="com.ssm.entity.Project">
+        select id, title, candidates from projects where candidates is not null
+    </select>
+
+    <select id="queryLevel2" resultType="com.ssm.entity.Project">
+        select projects.id, name as level2
+        from ccs
+        RIGHT JOIN projects on projects.level2 = ccs.id;
+    </select>
+
+    <select id="queryLevel3" resultType="com.ssm.entity.Project">
+        select projects.id, name as level3
+        from ccs
+        RIGHT JOIN projects on projects.level3 = ccs.id;
+    </select>
+
+    <select id="findProjectByLanguage" resultType="com.ssm.entity.Project">
+        select * from projects where language = #{language}
+    </select>
+
+    <select id="queryProjectById" parameterType="int" resultType="com.ssm.entity.Project">
+        select * from projects where id = #{id}
+    </select>
+
+    <select id="queryProjectsBySupervisor" resultType="com.ssm.entity.Project">
+        select * from projects where supervisor = #{supervisor}
+    </select>
+
+    <select id="queryProjectsByCategory" resultType="com.ssm.entity.Project">
+        select projects.id, title, supervisor, reference, `language`, description, degree, ccs.name as level1, level2
+        from projects
+        LEFT JOIN ccs on projects.level1 = ccs.id where level1 = #{code} or level2 = #{code} or level3 = #{code}
+    </select>
+
+    <select id="queryCCSByCode1" resultType="com.ssm.entity.CCS" parameterType="int">
+        select id, name, code from ccs where code = #{id1}
+    </select>
+
+    <select id="queryCCSByCode2" resultType="com.ssm.entity.CCS">
+        select id, name, code from ccs where id = #{id1}
+        union
+        select id, name, code from ccs where id = #{id2} and code = #{id1}
+    </select>
+
+    <select id="queryCCSByName" resultType="com.ssm.entity.CCS">
+        select name, code from ccs where name = #{level1}
+        union
+        select name, code from ccs where name = #{level2}
+        union
+        select name, code from ccs where name = #{level3}
+    </select>
+
+    <update id="modifyProject">
+        update Projects where id = #{id}
+        <set>
+            <if test="title != null">and title = #{title}</if>
+            <if test="supervisor != null">and supervisor = #{supervisor}</if>
+            <if test="description != null">and description = #{description}</if>
+            <if test="language != null">and language = #{language}</if>
+            <if test="reference != null">and reference = #{reference}</if>
+            <if test="level1 != null">and level1 = #{level1}</if>
+            <if test="level2 != null">and level2 = #{level2}</if>
+        </set>
+    </update>
+
+    <update id="concatInterest">
+        update projects set candidates = CONCAT(candidates, #{content}, ',') where id = #{id}
+    </update>
+
+    <!--
+    <select id="queryProject" resultType="com.ssm.entity.Project">
+        select * from projects
+        <choose>
+            <when test="title!=null">
+                AND title like #{title}
+            </when>
+            <when test="language!=null">
+                where languages = #{language}
+            </when>
+            <when test="supervisor!=null">
+                where supervisor = #{supervisor}
+            </when>
+        </choose>
+    </select>
+
+    <select id="findAllProjects" resultType="com.ssm.entity.Project">
+        select * from projects where available = 0
+    </select>
+
+    <select id="queryProjectsByCategory" resultType="com.ssm.entity.Project">
+        select * from projects where level2 = #{code}
+    </select>
+
+    <select id="findProjectByLanguage" resultType="com.ssm.entity.Project">
+        select * from projects where language = #{language}
+    </select>
+
+    <select id="queryProjectById" parameterType="int" resultType="com.ssm.entity.Project">
+        select * from projects where id = #{id}
+    </select>
+
+    -->
+
+    <insert id="addProject" parameterType="com.ssm.entity.Project" useGeneratedKeys="true" keyProperty="projectId">
+        INSERT INTO projects (title, supervisor, reference, language, candidates, available, description, level1, level2)
+        VALUES (#{title}, #{supervisor}, #{reference}, #{language}, '', 0 ,#{description}, #{level1}, #{level2})
+    </insert>
+
+
+</mapper>

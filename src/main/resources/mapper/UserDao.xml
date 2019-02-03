@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssm.dao.UserDao">
+
+    <!-- 查询所有用户 -->
+    <select id="findAll" parameterType="com.ssm.entity.User">
+        SELECT * FROM user
+    </select>
+
+    <!-- 查询用户 -->
+    <select id="findUserById" resultType="com.ssm.entity.User" parameterType="int">
+        SELECT * FROM user WHERE id = #{id}
+    </select>
+
+    <select id="findUserByUsername" resultType="com.ssm.entity.User" parameterType="String">
+        SELECT * FROM user WHERE username = #{username}
+    </select>
+
+    <!-- 添加用户 -->
+    <insert id="addUser" parameterType="com.ssm.entity.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user (name, age, username, password, identity)
+        VALUES(#{name},#{age},#{username},#{password},#{identity})
+    </insert>
+
+    <delete id="deleteUser" parameterType="com.ssm.entity.User">
+        DELETE FROM user WHERE id = #{id}
+    </delete>
+
+    <update id="updateUser" parameterType="com.ssm.entity.User">
+        UPDATE USER SET name = #{name}, age = #{age}, username = #{username}, password = #{password} WHERE id = #{id}
+    </update>
+
+    <update id="updateTest" parameterType="com.ssm.entity.User">
+        update user
+        <set>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="age != null and age != ''">
+                and age = #{age}
+            </if>
+            <if test="username != null and username != ''">
+                and username = #{username}
+            </if>
+            <if test="password != null and password != ''">
+                and password = #{password}
+            </if>
+            <if test="identity != null and identity != ''">
+                and identity = #{identity}
+            </if>
+        </set>
+    </update>
+
+    <!-- 追加项目 -->
+    <update id="update-project" parameterType="com.ssm.entity.User">
+        update students set selected = concat(selected, #{project}) where stuid =  18000000
+    </update>
+
+</mapper>
