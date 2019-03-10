@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Project Page</title>
+		<script src="../js/project.js"></script>
+		<link rel="stylesheet" href="../css/project.css">
+		<link rel="stylesheet" href="../css/bootstrap1.min.css">
+	</head>
+	<body>
+		<nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+  			<a id="index" class="navbar-brand col-sm-3 col-md-2 mr-0" href="index.html">Index</a>
+		</nav>
+
+		<div class="container-fluid">
+  			<div class="row">
+    			<nav class="col-md-2 d-none d-md-block bg-light sidebar">
+      				<div class="sidebar-sticky">
+        				<ul class="nav flex-column">
+							<span id="degree"></span><br>
+							<span id="supervisor"></span><br>
+							<span id="language"></span><br>
+							<b>CCS category: </b>
+          					<div id="ccs">
+								<span id="level1"></span><br>
+								<span id="level2"></span><br>
+								<span id="level3"></span>
+							</div>
+            			</ul>
+      				</div>
+    			</nav>
+				<div role="main" id="project" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+					<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+						<b id="title">
+						
+						</b>
+					</div><br>
+					
+					<div id="reference"></div><br>
+					<div id="description"></div><br><br>
+
+					<div id="groupBtn" class="input-group">
+						<div class="col-xs-2">
+							<select id="tendency" name="tendency" class="custom-select" style="width: auto;">
+								<option>Choose...</option>
+								<option>5</option>
+								<option>4</option>
+								<option>3</option>
+								<option>2</option>
+								<option>1</option>
+							</select>
+						</div>
+						<button id="submit" class="btn btn-success disabled">Vote</button>
+					</div>
+				</div>
+	  		</div>
+		</div>
+	</body>
+</html>

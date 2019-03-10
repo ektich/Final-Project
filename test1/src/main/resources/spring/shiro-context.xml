@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <!--加载管理器-->
+        <property name="filters">
+            <map>
+                <entry key="logout" value-ref="systemLogoutFilter" />
+            </map>
+        </property>
+        <property name="securityManager" ref="securityManager" />
+        <!--没有登录的时候，跳转到这个页面-->
+        <property name="loginUrl" value="/html/login.html" />
+        <!--当没有权限的时候，跳转到这个url-->
+        <property name="unauthorizedUrl" value="/user/nopermission" />
+        <!-- 过虑器链定义，从上向下顺序执行，一般将/**放在最下边 -->
+        <property name="filterChainDefinitions">
+            <value>
+                /user/login = anon                          <!--可以不需要登录-->
+                /user/readName = authc, perms[/readName]    <!-- perms 表示需要该权限才能访问的页面 -->
+                /user/readData = authc, perms[/readData]
+                /user/* = authc                             <!-- authc 表示需要认证才能访问的页面 -->
+                <!-- 静态资源不拦截 -->
+                /images/** = anon
+                /js/** = perms
+                /style/** = anon
+            </value>
+        </property>
+    </bean>
+
+    <!-- 自定义Realm -->
+    <bean id="myShiroRealm" class="com.ssm.shiro.MyShiroRealm">
+        <!-- businessManager 用来实现用户名密码的查询 -->
+        <property name="shiroService" ref="accountService" />
+    </bean>
+    <bean id="cacheManager" class="org.apache.shiro.cache.MemoryConstrainedCacheManager" />
+    <bean id="sessionManager" class="com.ssm.shiro.CustomDefaultWebSessionManager">
+        <!-- 设置超时时间 -->
+        <property name="globalSessionTimeout" value="900000"/>
+        <property name="sessionValidationInterval" value="900000" />
+        <property name="deleteInvalidSessions" value="true"/>
+        <property name="sessionValidationSchedulerEnabled" value="true"/>
+        <property name="sessionIdCookieEnabled" value="true"/>
+    </bean>
+    <!--自定义LogoutFilter,退出-->
+    <bean id="systemLogoutFilter" class="com.ssm.shiro.SystemLogoutFilter" />
+
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <!-- 注入realm -->
+        <property name="realm" ref="myShiroRealm" />
+        <property name="sessionManager" ref="sessionManager" />
+        <property name="cacheManager" ref="cacheManager" />
+    </bean>
+
+    <!--声明一个Service 注入到自定义Realm-->
+    <bean id="accountService" class="com.ssm.service.impl.ShiroServiceImpl"/>
+    <!--
+    <bean id="shiroCacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+        <property name="cacheManager" ref="cacheManager" />
+    </bean>
+    -->
+
+
+
+    <!--sessionIdCookie的实现，用于重写覆盖容器默认的JSESSIONID-->
+    <bean id="shareSession" class="org.apache.shiro.web.servlet.SimpleCookie">
+        <constructor-arg name="name" value="SHAREJSESSIONID"/>
+        <property name="path" value="/"/>
+        <!-- 浏览器关闭session失效，不计入cookie -->
+        <property name="maxAge" value="-1"/>
+    </bean>
+
+</beans>

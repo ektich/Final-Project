@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssm.dao.ShiroDao">
+    <select id="getUserByUserName" resultType="com.ssm.entity.User">
+        select * FROM user
+        WHERE username = #{username}
+    </select>
+
+    <select id="getUserRoleByUserId" resultType="int">
+        SELECT id FROM user_role
+        where id = #{_parameter}
+    </select>
+
+    <select id="getPermissionsByRoleId" resultType="com.ssm.entity.Permission">
+        SELECT a.id,a.url,a.roleid as roleId,a.description FROM permission a
+        WHERE roleid = #{_parameter}
+    </select>
+
+</mapper>
