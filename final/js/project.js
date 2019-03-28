@@ -104,12 +104,14 @@ function collectData () {
 	const pid = sessionStorage.getItem("pid");;
 	const sid = username;
 	//http://localhost:8080/project/interested?pid=1&sid=18000000&tendency=5
-	
+	const answer = confirm('Are you sure to designate this project to this student?');
 	const data = '?pid=' + pid + '&sid=' + sid + '&tendency=' + marks;
 	let url = 'http://localhost:8080/project/interested' + data;
-	ajaxRequest(url, '', 'get', 'form').then(response => {
-		if(response === 1) {
-			alert('Submitted successfully');
-		}
-	});
+	if(answer) {
+		ajaxRequest(url, '', 'get', 'form').then(response => {
+			if(response === 1) {
+				alert('Submitted successfully');
+			}
+		});
+	}
 }

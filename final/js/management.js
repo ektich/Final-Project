@@ -56,9 +56,9 @@ function maintainCookie() {
 
 function manageProjectFunction () {
 	const data = 'username=' + username;
-	const url = 'http://localhost:8080/project/dispose';
+	const url = 'http://localhost:8080/project/dispose?' + data;
 	if(username !== '') {
-		ajaxRequest(url, data, 'post').then(result => {
+		ajaxRequest(url, '', 'get').then(result => {
 			//console.log(result);
 			for(let i = 0; i < result.length; i++) {
 				if(result[i][0].draft !== 'true') {
@@ -168,7 +168,8 @@ function generateSubmitButton(tbody) {
 			const a = document.createElement('a');
 			a.setAttribute('class', 'btn-sm btn-success');
 			a.setAttribute('href', '#');
-			a.innerHTML = 'Save Changes';
+			a.innerHTML = '&nbsp&nbspSave&nbsp&nbsp';
+			a.onclick = submitChanges;
 			td.appendChild(a);
 		}
 		tr.appendChild(td);
@@ -225,13 +226,16 @@ function generateItems (tbody, p, i, j) {
 		} else if(i === 1) {
 			td.innerHTML = p.tendency;
 		} else if(i === 2) {
+			const span = document.createElement('span');
+			span.innerHTML = '✔';
+			span.style.display = 'none';
 			if(p.designated === p.sid) {
 				button2.innerHTML = 'Cancel';
 				button2.setAttribute('href', '#');
 				button2.setAttribute('sdid', p.sid);
 				button2.setAttribute('pdid', p.pid);
 				button2.setAttribute('class', 'btn-sm btn-danger');
-				button2.onclick = cancelCandidate;
+				button2.onclick = designateCandidate;
 				td.appendChild(button2);
 			} else {
 				button1.innerHTML = 'Designate';
@@ -242,6 +246,7 @@ function generateItems (tbody, p, i, j) {
 				button1.onclick = designateCandidate;
 				td.appendChild(button1);
 			}
+			td.appendChild(span);
 		}
 		tr.appendChild(td);
 	}
@@ -253,10 +258,10 @@ let level2Code = '';
 let level3Code = '';
 function editProject() {
 	projectId = this.getAttribute('data-id');
-	const url = 'http://localhost:8080/project/single';
 	const data = 'id=' + this.getAttribute('data-id') + '&name=false';
-	ajaxRequest(url, data, 'post').then(response => {
-		console.log(response);
+	const url = 'http://localhost:8080/project/single?' + data;
+	ajaxRequest(url, '', 'get').then(response => {
+		//console.log(response);
 		level1Code = response.project.level1;
 		level2Code = response.project.level2;
 		level3Code = response.project.level3;
@@ -302,10 +307,10 @@ function chain() {
 function deleteProject() {
 	const answer = confirm("Are you sure to delete this project?")
 	const id = this.getAttribute('data-id');
-	const url = 'http://localhost:8080/project/delete';
 	const data = 'code=' + id;
+	const url = 'http://localhost:8080/project/delete?' + data;
   	if (answer) {
-    	ajaxRequest(url, data, 'post').then(response => {
+    	ajaxRequest(url, '', 'get').then(response => {
     		if(response === 1) {
     			alert("success");
     			setTimeout(() => {
@@ -596,10 +601,11 @@ function cancelCandidate() {
 function designateCandidate() {
 	const sid = this.getAttribute('sdid');
 	const pid = this.getAttribute('pdid');
-	const answer = confirm('Are you sure to designate this project to this student?');
+	//const answer = confirm('Are you sure to designate this project to this student?');
 	const data = '?sid=' + sid + '&pid=' + pid + '&isCancel=false';
 	const url = 'http://localhost:8080/project/designate' + data;
-  	if (answer) {
+  	/*
+	if (answer) {
     	ajaxRequest(url, '', 'get').then(response => {
     		console.log(response);
     		if(response === 1) {
@@ -610,20 +616,89 @@ function designateCandidate() {
     		}
     	});
   	}
+  	*/
+  	const outer = this.parentNode;
+  	addSymbol(outer);
+  	return false;
 }
 
-let btnChange_array = [];
+function addSymbol(outer) {
+	const span = outer.getElementsByTagName('span');
+	const a = outer.getElementsByTagName('a');
+	if(span[0].style.display === 'none') {
+		span[0].style.display = '';
+		a[0].setAttribute('check', 'true');
+	} else {
+		span[0].style.display = 'none';
+		a[0].removeAttribute('check');
+	}
+}
 
-function changeButtons() {
-	//this.style.color = ;
-	const span = document.createElement('span');
-	span.innerHTML = '✔';
+let list = [];
+
+class Todo {
+    constructor(pid, sid, isCancel) {
+        this.pid = pid;
+        this.sid = sid;
+        this.isCancel = isCancel;
+    }
+
+    toString() {
+        return 'pid=' + this.pid + ' | sid=' + this.sid + ' | isCancel=' + this.type;
+    }
 }
 
 function submitChanges() {
+	if(list.length !== 0) {
+		list = [];
+	}
 	const answer = confirm('Are you sure to submit these changes?');
+	const url = 'http://localhost:8080/project/designate';
+	const buttons = this.parentNode.parentNode.parentNode.getElementsByTagName('a');
+	for(let i of buttons) {
+		if(i.getAttribute('check') === 'true') {
+			const pid = i.getAttribute('pdid');
+			const sid = i.getAttribute('sdid');
+			const isCancel = i.innerHTML === 'Cancel';
+			let todo = new Todo(pid, sid, isCancel);
+			list.push(todo);
+		}
+	}
+	if(list.length === 0) {
+		return false;
+	}
 	if (answer) {
-		designateCandidate();
-		cancelCandidate();
+		ajaxRequest (url, JSON.stringify(list), 'post','json').then(response => {
+			if(response === 1) {
+				alert("Changes saved");
+			}
+			location.reload();
+		});
 	}
 }
+
+/*
+function submitChanges() {
+	const answer = confirm('Are you sure to submit these changes?');
+	const url = 'http://localhost:8080/project/designate';
+	if (answer) {
+		const buttons = this.parentNode.parentNode.parentNode.getElementsByTagName('a');
+		for(let i of buttons) {
+			if(i.getAttribute('check') === 'true') {
+				const pid = i.getAttribute('pdid');
+				const sid = i.getAttribute('sdid');
+				const isCancel = i.innerHTML === 'Cancel';
+				let todo = new Todo(pid, sid, isCancel);
+				list.push(todo);
+			}
+		}
+		if(list.length === 0) return false;
+		ajaxRequest (url, JSON.stringify(list), 'post','json').then(response => {
+			if(response === 1) {
+				alert("Changes saved");
+			}
+			location.reload();
+		});
+	}
+}
+*/

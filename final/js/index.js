@@ -687,10 +687,6 @@ function maintainCookie() {
     let cookie = [];
     cookie = document.cookie.split("; ");
     for(let i of cookie) {
-        /*
-        const s1 = i.split("=")[0].trim();
-        const s2 = i.split("=")[1].trim();
-        */
         const s1 = i.split("=")[0];
         const s2 = i.split("=")[1];
         if(s1 === 'username') {

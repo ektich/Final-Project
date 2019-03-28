@@ -21,11 +21,11 @@ function login () {
 }
 
 function loginCheck (data) {
-    let url = 'http://localhost:8080/login.do';
+    let url = 'http://localhost:8080/login.do?' + data;
     return new Promise((resolve, reject) => {
         let req = new XMLHttpRequest();
         req.responseType = 'json';
-        req.open('POST', url, true);
+        req.open('GET', url, true);
         req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         //req.setRequestHeader("Content-type", "application/json");
         req.withCredentials = true;
@@ -39,6 +39,6 @@ function loginCheck (data) {
         req.onerror = () => {
             reject(Error('Network Error'));
         };
-        req.send(data);
+        req.send();
     });
 }
