@@ -5,7 +5,7 @@ Frontend and backend commnuicate using json.
 
 The goal of this project is to develop a new web platform for the computer science department of MU to organise and schedule final year projects.
 
-Included three use cases test:
+Included three use case tests:
 1. Student submit interest form and query result.
 2. Lecture designate candidate who do this project and cancel candidate.
 3. Lecture add, delete, update, query projects details.
